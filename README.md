@@ -21,11 +21,11 @@ The dashboard provides an intuitive interface where users can adjust various par
 Here are some screenshots showcasing the dashboard's interface and functionality:
 
 ### Interactive Input and Prediction
-![Dashboard Input and Prediction](images/Screenshot 2026-07-27 at 12.43.17 AM.png)
+![Dashboard Input and Prediction](images/dashboard.png)
 *Adjust parameters and receive real-time SHC risk predictions.*
 
 ### Explainable AI (XAI) Insights
-![SHAP Explanation Plot](images/Screenshot 2026-07-27 at 12.43.29 AM.png)
+![SHAP Explanation Plot](images/shap.png)
 *Understand the model's decision-making process with SHAP waterfall plots and feature importance.*
 
 
