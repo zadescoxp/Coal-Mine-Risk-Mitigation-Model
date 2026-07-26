@@ -76,7 +76,7 @@ vg_stress_2 = pn.widgets.Checkbox(name='Veg Stress: 2', value=True)
 # Prediction button and output areas
 predict_button = pn.widgets.Button(name='Predict SHC Risk', button_type='primary', width=200)
 prediction_output = pn.pane.Markdown("", width=400, css_classes=['prediction-output'])
-shap_explanation_plot = pn.pane.Markdown("", width=600, height=300, sizing_mode='stretch_width')
+shap_explanation_plot = pn.pane.Matplotlib(None, width=600, height=300, sizing_mode='stretch_width', dpi=100)
 shap_summary_text = pn.pane.Markdown("", width=600, sizing_mode='stretch_width')
 
 # --- Global Feature Importance Plot ---
@@ -139,20 +139,36 @@ def make_prediction(event):
     prediction_output.object = result
 
     # --- SHAP Explanation ---
-    shap_values = explainer.shap_values(final_input_df)
+    raw_shap_values = explainer.shap_values(final_input_df)
 
-    # For binary classification, shap_values returns a list of arrays (one for each class).
-    # We are interested in the explanation for the positive class (index 1).
-    shap_values_for_display = shap_values[1][0] if isinstance(shap_values, list) else shap_values[0]
+    # Handle cases where shap_values might be a list of arrays (standard) or a single 3D array (some versions/models)
+    if isinstance(raw_shap_values, list):
+        # For binary classification, raw_shap_values is a list like [shap_values_class0, shap_values_class1]
+        # Each element is an array of shape (num_samples, num_features)
+        shap_values_for_display = raw_shap_values[1][0] # Get positive class (index 1), first sample (index 0)
+        base_value_for_display = explainer.expected_value[1]
+    elif isinstance(raw_shap_values, np.ndarray) and raw_shap_values.ndim == 3:
+        # Some SHAP versions/explainers return a 3D array (num_samples, num_features, num_classes)
+        # We need the SHAP values for the first sample (index 0) and the positive class (index 1)
+        shap_values_for_display = raw_shap_values[0, :, 1]
+        base_value_for_display = explainer.expected_value[1]
+    else:
+        shap_explanation_plot.object = None # Clear the plot if format is unexpected
+        shap_summary_text.object = pn.pane.Markdown("Error: SHAP values returned in an unexpected format. Cannot generate explanation.")
+        return
 
-    # Create a SHAP waterfall plot or force plot
-    # Need to render SHAP plot as a static image or save to HTML, then display as Markdown
-    # For Panel, a static image is easier to embed without extra dependencies or complex rendering
+    # Create a SHAP Explanation object
+    explanation = shap.Explanation(values=shap_values_for_display,
+                                  base_values=base_value_for_display,
+                                  data=final_input_df.iloc[0],
+                                  feature_names=feature_columns)
+
+    # Create a SHAP waterfall plot
     fig_shap = plt.figure(figsize=(10, 6))
-    shap.waterfall_plot(shap.Explanation(values=shap_values_for_display, base_values=explainer.expected_value[1] if isinstance(explainer.expected_value, np.ndarray) else explainer.expected_value, data=final_input_df.iloc[0], feature_names=feature_columns))
+    shap.waterfall_plot(explanation, show=False) # show=False prevents immediate display, allowing Panel to handle it
     plt.tight_layout()
-    plt.close(fig_shap)
-    shap_explanation_plot.object = pn.pane.Matplotlib(fig_shap, dpi=100)
+    # Removed plt.close(fig_shap) to ensure the figure is available for Panel to render
+    shap_explanation_plot.object = fig_shap # Assign the matplotlib figure directly
 
     # Textual summary of SHAP values
     explanation_text = "**Key factors influencing this prediction:**\n\n"
