@@ -16,6 +16,19 @@ According to various reports (e.g., from the U.S. Mine Safety and Health Adminis
 
 The dashboard provides an intuitive interface where users can adjust various parameters related to coal piles and environmental conditions. The machine learning model processes these inputs to predict the SHC risk (High or Low) and the probability of high risk. Crucially, the integrated XAI component explains these predictions, highlighting which features contributed most to the outcome.
 
+## Visual Overview
+
+Here are some screenshots showcasing the dashboard's interface and functionality:
+
+### Interactive Input and Prediction
+![Dashboard Input and Prediction](images/Screenshot 2026-07-27 at 12.43.17 AM.png)
+*Adjust parameters and receive real-time SHC risk predictions.*
+
+### Explainable AI (XAI) Insights
+![SHAP Explanation Plot](images/Screenshot 2026-07-27 at 12.43.29 AM.png)
+*Understand the model's decision-making process with SHAP waterfall plots and feature importance.*
+
+
 ## Key Features
 
 *   **Interactive Input Widgets**: Easily adjust environmental, coal pile, and coal type parameters.
@@ -44,6 +57,10 @@ my_shc_project/
 │   └── feature_importances.pkl            (Saved global feature importances)
 ├── run_training.py                      (Script to run data preprocessing and model training)
 ├── requirements.txt                     (Python dependencies)
+├── docs/
+│   └── images/                          (Contains project screenshots)
+│       ├── Screenshot 2026-07-27 at 12.43.17 AM.png
+│       └── Screenshot 2026-07-27 at 12.43.29 AM.png
 └── README.md                            (This file)
 ```
 
