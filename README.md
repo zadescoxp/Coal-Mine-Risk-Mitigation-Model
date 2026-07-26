@@ -136,4 +136,4 @@ This command will open the dashboard in your default web browser. You can then i
 
 ## License
 
-(Consider adding a license file, e.g., MIT, if you plan to share this publicly.)
+MIT LICENSE
